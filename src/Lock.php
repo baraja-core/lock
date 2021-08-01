@@ -19,7 +19,7 @@ final class Lock
 	private static ?TransactionProvider $transactionProvider = null;
 
 
-	public static function wait(?string $transactionName = null, int $maxExecutionTimeMs = 30000, $ttl = 500): void
+	public static function wait(?string $transactionName = null, int $maxExecutionTimeMs = 30000, int $ttl = 500): void
 	{
 		$startTime = microtime(true);
 		while (true) {

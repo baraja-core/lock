@@ -134,7 +134,7 @@ final class FileTransactionProvider implements TransactionProvider
 		$message = ini_get('html_errors')
 			? html_entity_decode(strip_tags($message), ENT_QUOTES | ENT_HTML5, 'UTF-8')
 			: $message;
-		$message = preg_replace('#^\w+\(.*?\): #', '', $message);
+		$message = (string) preg_replace('#^\w+\(.*?\): #', '', $message);
 
 		return $message;
 	}
