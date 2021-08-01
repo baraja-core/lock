@@ -1,7 +1,7 @@
 {
-	"name": "baraja-core/template",
-	"description": "This is a template package.",
-	"homepage": "https://github.com/baraja-core/template",
+	"name": "baraja-core/lock",
+	"description": "Simple PHP function lock system.",
+	"homepage": "https://github.com/baraja-core/lock",
 	"authors": [
 		{
 			"name": "Jan Barášek",
