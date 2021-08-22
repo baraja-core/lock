@@ -78,7 +78,7 @@ final class FileTransactionProvider implements TransactionProvider
 
 		$content = @file_get_contents($file); // @ is escalated to exception
 		if ($content === false) {
-			throw new \RuntimeException('Unable to read file "' . $file . '". ' . $this->getLastError());
+			return false;
 		}
 		if (((float) (explode('|', $content)[0] ?? '0')) - microtime(true) > 0) {
 			return true;
