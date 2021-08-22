@@ -44,6 +44,9 @@ final class Lock
 
 	public static function stopTransaction(?string $transactionName = null): void
 	{
+		if (self::isTransactionRunning($transactionName) === false) {
+			return;
+		}
 		self::getTransactionProvider()
 			->stopTransaction($transactionName);
 	}
