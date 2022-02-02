@@ -102,7 +102,7 @@ final class FileTransactionProvider implements TransactionProvider
 	{
 		if ($transactionName === null) {
 			$transactionName = 'common';
-		} elseif (!preg_match('/^[a-zA-Z0-9]+/', $transactionName)) {
+		} elseif (!preg_match('/^[a-zA-Z0-9]+$/', $transactionName)) {
 			$transactionName = md5($transactionName);
 		}
 
