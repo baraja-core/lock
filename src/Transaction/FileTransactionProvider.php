@@ -22,12 +22,12 @@ final class FileTransactionProvider implements TransactionProvider
 	{
 		$this->mode = $mode;
 		if ($baseDir === null) {
-			$baseDir = sys_get_temp_dir() . '/lock/' . md5(__FILE__);
+			$baseDir = sprintf('%s/lock/%s', sys_get_temp_dir(), md5(__FILE__));
 		}
 		if (!is_dir($baseDir)) {
 			$this->createDir($baseDir);
 		}
-		$this->baseDir = (string) $baseDir;
+		$this->baseDir = $baseDir;
 		if (mt_rand() / mt_getrandmax() < $this->gcProbability) {
 			try {
 				$this->gc();
@@ -44,15 +44,17 @@ final class FileTransactionProvider implements TransactionProvider
 	{
 		$file = $this->getFilePath($transactionName);
 		$time = (string) (microtime(true) + ($maxExecutionTimeMs / 1000));
-		$content = $time . '|' . ($transactionName ?? 'common');
+		$content = sprintf('%s|%s', $time, $transactionName ?? 'common');
 		if (@file_put_contents($file, $content) === false) { // @ is escalated to exception
-			throw new \RuntimeException('Unable to write file "' . $file . '". ' . $this->getLastError());
+			throw new \RuntimeException(sprintf('Unable to write file "%s". %s', $file, $this->getLastError()));
 		}
 		if (!@chmod($file, $this->mode)) { // @ is escalated to exception
-			throw new \RuntimeException(
-				'Unable to chmod file "' . $file . '" to mode ' . decoct($this->mode)
-				. '. ' . $this->getLastError(),
-			);
+			throw new \RuntimeException(sprintf(
+				'Unable to chmod file "%s" to mode %s. %s',
+				$file,
+				decoct($this->mode),
+				$this->getLastError(),
+			));
 		}
 	}
 
@@ -64,7 +66,7 @@ final class FileTransactionProvider implements TransactionProvider
 			return;
 		}
 		if (!@unlink($file)) { // @ is escalated to exception
-			throw new \RuntimeException('Unable to delete "' . $file . '". ' . $this->getLastError());
+			throw new \RuntimeException(sprintf('Unable to delete "%s". %s', $file, $this->getLastError()));
 		}
 	}
 
@@ -116,10 +118,12 @@ final class FileTransactionProvider implements TransactionProvider
 	private function createDir(string $dir): void
 	{
 		if (!is_dir($dir) && !@mkdir($dir, $this->mode, true) && !is_dir($dir)) { // @ - dir may already exist
-			throw new \RuntimeException(
-				'Unable to create directory "' . $dir . '" with mode ' . decoct($this->mode)
-				. '. ' . $this->getLastError(),
-			);
+			throw new \RuntimeException(sprintf(
+				'Unable to create directory "%s" with mode %s. %s',
+				$dir,
+				decoct($this->mode),
+				$this->getLastError(),
+			));
 		}
 	}
 
@@ -131,6 +135,7 @@ final class FileTransactionProvider implements TransactionProvider
 	private function getLastError(): string
 	{
 		$message = error_get_last()['message'] ?? '';
+		/** @phpstan-ignore-next-line */
 		$message = ini_get('html_errors')
 			? html_entity_decode(strip_tags($message), ENT_QUOTES | ENT_HTML5, 'UTF-8')
 			: $message;
@@ -151,7 +156,7 @@ final class FileTransactionProvider implements TransactionProvider
 				continue;
 			}
 			if (!@unlink($file)) { // @ is escalated to exception
-				throw new \RuntimeException('Unable to delete "' . $file . '". ' . $this->getLastError());
+				throw new \RuntimeException(sprintf('Unable to delete "%s". %s', $file, $this->getLastError()));
 			}
 		}
 	}
